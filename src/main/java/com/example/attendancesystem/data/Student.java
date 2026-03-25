@@ -1,0 +1,13 @@
+package com.example.attendancesystem.data;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Student {
+    private String Name;
+    private String Id;
+}
