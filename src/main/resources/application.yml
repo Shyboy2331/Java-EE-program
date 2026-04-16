@@ -3,5 +3,18 @@ spring:
     name: demo
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=studentinfo;integratedSecurity=true;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=studentinfo;integratedSecurity=true;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
