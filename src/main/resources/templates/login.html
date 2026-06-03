@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 考勤系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: url('/templates/images/login-bg.png') no-repeat center center fixed;
+            background-color: #667eea;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 身份选择卡片 */
+        .role-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .role-card {
+            flex: 1;
+            padding: 20px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .role-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .role-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .role-card .role-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .role-card .role-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .role-card .role-desc {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .extra-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .extra-links a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .extra-links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .role-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>📚 考勤系统</h1>
+            <p>欢迎回来，请选择身份登录</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- 身份选择 -->
+        <div class="role-selector">
+            <div class="role-card active" data-role="STUDENT" onclick="selectRole('STUDENT')">
+                <div class="role-icon">👨‍🎓</div>
+                <div class="role-name">学生</div>
+                <div class="role-desc">学生考勤</div>
+            </div>
+            <div class="role-card" data-role="TEACHER" onclick="selectRole('TEACHER')">
+                <div class="role-icon">👨‍🏫</div>
+                <div class="role-name">教师</div>
+                <div class="role-desc">教学管理</div>
+            </div>
+        </div>
+
+        <input type="hidden" id="selectedRole" value="STUDENT" class="role-input">
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required />
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码" required />
+            </div>
+            <button type="submit" class="login-btn">登 录</button>
+        </form>
+
+        <div class="extra-links">
+            <a href="/register">没有账号？立即注册</a>
+        </div>
+    </div>
+
+    <script>
+        // 身份选择
+        function selectRole(role) {
+            document.getElementById('selectedRole').value = role;
+            
+            // 更新卡片样式
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.role === role) {
+                    card.classList.add('active');
+                }
+            });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('selectedRole').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            try {
+                const response = await fetch('/student/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, role })
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    const user = result.data.user;
+                    // 保存 token 到 localStorage
+                    localStorage.setItem('token', result.data.token);
+                    localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('loginTime', new Date().toISOString());
+                    localStorage.setItem('userRole', role);
+                    
+                    // 根据身份跳转到不同首页
+                    if (role === 'TEACHER') {
+                        window.location.href = '/teacher/homepage';
+                    } else {
+                        window.location.href = '/student/homepage';
+                    }
+                } else {
+                    errorMessage.textContent = result.message || '登录失败，请检查用户名和密码';
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                errorMessage.textContent = '网络错误，请稍后重试';
+                errorMessage.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

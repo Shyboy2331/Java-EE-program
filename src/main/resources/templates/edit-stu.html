@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - 考勤系统'">编辑学生 - 考勤系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: url('/templates/images/index-bg.jpg') no-repeat center center fixed;
+            background-color: #f5f7fa;
+            background-size: cover;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-menu a:hover,
+        .navbar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .user-info {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        /* 主体内容区 */
+        .main-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-card h3 {
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-group label .required {
+            color: #f44336;
+            margin-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: #f44336;
+        }
+
+        .form-group input:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 6px;
+            min-height: 18px;
+        }
+
+        .error-message:empty {
+            display: none;
+        }
+
+        .hint {
+            color: #999;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            margin-top: 15px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-danger:hover {
+            background: #da3232;
+        }
+
+        /* 返回链接 */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* 消息提示 */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .alert.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        /* 加载状态 */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-state p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* 未登录提示 */
+        .not-logged-in {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .not-logged-in .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .not-logged-in p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <a href="/student/homepage" class="navbar-brand">📚 考勤系统</a>
+        <div class="navbar-menu">
+            <a href="/student/homepage">首页</a>
+            <a href="/student/list-page">学生列表</a>
+            <a href="/student/add">添加学生</a>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <span>管理员</span>
+        </div>
+    </nav>
+
+    <!-- 主体内容 -->
+    <div class="main-container">
+        <div class="content-card">
+            <h3>✏️ 编辑学生信息</h3>
+
+            <!-- 加载状态 -->
+            <div id="loading" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>正在加载学生信息...</p>
+            </div>
+
+            <!-- 未登录提示 -->
+            <div id="notLoggedIn" class="not-logged-in" style="display: none;">
+                <div class="icon">⚠️</div>
+                <p>您尚未登录或登录已过期</p>
+                <button class="btn btn-primary" onclick="window.location.href='/login'" style="margin-top: 20px; width: auto; padding: 12px 40px;">立即登录</button>
+            </div>
+
+            <!-- 消息提示 -->
+            <div id="alert" class="alert" th:classappend="${success != null ? 'success show' : (error != null ? 'error show' : '')}"
+                 th:text="${success != null ? success : (error != null ? error : '')}"></div>
+
+            <!-- 编辑学生表单 -->
+            <form id="editForm" style="display: none;" onsubmit="return handleSubmit(event)">
+                <div class="form-group">
+                    <label>学号</label>
+                    <input type="text" id="id" name="id" th:value="${student != null ? student.id : ''}" disabled />
+                    <input type="hidden" name="id" th:value="${student != null ? student.id : ''}" />
+                    <div class="hint">学号为唯一标识，不可修改</div>
+                </div>
+
+                <div class="form-group">
+                    <label>姓名 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" th:value="${student != null ? student.name : ''}" placeholder="请输入学生姓名" required />
+                    <div class="error-message" id="errorName"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="gender" name="gender">
+                        <option value="">请选择</option>
+                        <option value="男" th:selected="${student != null and student.gender == '男'}">男</option>
+                        <option value="女" th:selected="${student != null and student.gender == '女'}">女</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>班级 <span class="required">*</span></label>
+                    <input type="text" id="classname" name="classname" th:value="${student != null ? student.classname : ''}" placeholder="请输入班级（如：计算机 2401 班）" required />
+                    <div class="error-message" id="errorClassname"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>出生日期</label>
+                    <input type="date" id="birthDate" name="birthDate" th:value="${student != null and student.birthDate != null ? student.birthDate : ''}" />
+                    <div class="error-message" id="errorBirthDate"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>联系方式</label>
+                    <input type="tel" id="contact" name="contact" th:value="${student != null ? student.contact : ''}" placeholder="请输入手机号码（11 位）" maxlength="11" />
+                    <div class="error-message" id="errorContact"></div>
+                    <div class="hint">格式：13812345678</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">💾 保存修改</button>
+                <button type="reset" class="btn btn-secondary">🔄 重置表单</button>
+                <button type="button" class="btn btn-danger" id="deleteBtn" th:data-student-id="${student != null ? student.id : ''}">🗑️ 删除学生</button>
+            </form>
+
+            <div class="back-link">
+                <a href="/student/list-page">← 返回学生列表</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时检查登录状态并加载学生数据
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadStudentData();
+            
+            // 绑定删除按钮事件
+            const deleteBtn = document.getElementById('deleteBtn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-student-id');
+                    if (studentId) {
+                        deleteStudent(studentId);
+                    } else {
+                        alert('未找到学生 ID');
+                    }
+                });
+            }
+        });
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                // 未登录，显示提示
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('notLoggedIn').style.display = 'block';
+                document.getElementById('editForm').style.display = 'none';
+                return false;
+            }
+            
+            // 更新导航栏用户信息
+            try {
+                const userInfo = JSON.parse(user);
+                const userSpan = document.querySelector('.user-info span');
+                if (userSpan && userInfo.real_name) {
+                    userSpan.textContent = userInfo.real_name;
+                } else if (userSpan && userInfo.user_name) {
+                    userSpan.textContent = userInfo.user_name;
+                }
+            } catch (e) {
+                console.error('解析用户信息失败:', e);
+            }
+            
+            return true;
+        }
+
+        // 加载学生数据（优先使用后端传递的数据，如果没有则通过 API 加载）
+        function loadStudentData() {
+            // 首先检查登录状态
+            if (!checkLoginStatus()) {
+                return;
+            }
+
+            // 尝试从 Thymeleaf 模板获取学生 ID（后端传递的 hidden 字段）
+            const hiddenIdInput = document.querySelector('input[type="hidden"][name="id"]');
+            let studentId = hiddenIdInput ? hiddenIdInput.value : null;
+            
+            // 如果没有，从 URL 获取
+            if (!studentId) {
+                const urlParams = new URLSearchParams(window.location.search);
+                studentId = urlParams.get('id');
+            }
+            
+            if (!studentId) {
+                showAlert('未指定学生 ID', 'error');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // 检查表单是否已经有数据（Thymeleaf 渲染的）
+            const nameInput = document.getElementById('name');
+            if (nameInput && nameInput.value) {
+                // 后端已经传递了数据，直接显示表单
+                console.log('使用后端传递的数据');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('editForm').style.display = 'block';
+                return;
+            }
+
+            // 后端没有传递数据，通过 API 加载
+            console.log('通过 API 加载数据');
+            loadStudentFromApi(studentId);
+        }
+
+        // 通过 API 加载学生数据
+        async function loadStudentFromApi(studentId) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('/student/api/' + encodeURIComponent(studentId), {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token ? 'Bearer ' + token : ''
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200 && result.data) {
+                    const student = result.data;
+                    // 填充表单数据
+                    document.getElementById('id').value = student.id || '';
+                    document.getElementById('name').value = student.name || '';
+                    document.getElementById('gender').value = student.gender || '';
+                    document.getElementById('classname').value = student.classname || '';
+                    document.getElementById('birthDate').value = student.birthDate || '';
+                    document.getElementById('contact').value = student.contact || '';
+                    
+                    // 显示表单
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('editForm').style.display = 'block';
+                } else {
+                    showAlert('加载学生信息失败：' + (result.message || '未知错误'), 'error');
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('加载失败:', error);
+                showAlert('网络错误，请稍后重试', 'error');
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // 显示消息提示
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('alert');
+            if (alertEl) {
+                alertEl.textContent = message;
+                alertEl.className = 'alert show ' + (type === 'error' ? 'error' : 'success');
+                alertEl.style.display = 'block';
+            }
+        }
+
+        // 验证表单
+        function validateForm() {
+            clearErrors();
+            let hasError = false;
+
+            const name = document.getElementById('name').value.trim();
+            const classname = document.getElementById('classname').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+
+            // 验证必填项
+            if (!name) {
+                showError('errorName', '姓名不能为空');
+                hasError = true;
+            }
+
+            if (!classname) {
+                showError('errorClassname', '班级不能为空');
+                hasError = true;
+            }
+
+            // 验证联系方式格式（如果填写）
+            if (contact && !/^1[3-9]\d{9}$/.test(contact)) {
+                showError('errorContact', '请输入有效的 11 位手机号码');
+                hasError = true;
+            }
+
+            return !hasError;
+        }
+
+        // 删除学生
+        function deleteStudent(id) {
+            if (!confirm('确定要删除该学生吗？此操作不可恢复。')) {
+                return;
+            }
+
+            // 获取 token
+            const token = localStorage.getItem('token');
+
+            fetch('/student/api/' + encodeURIComponent(id), {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token ? 'Bearer ' + token : ''
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    alert('删除成功');
+                    window.location.href = '/student/list-page';
+                } else {
+                    alert('删除失败：' + (result.message || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('删除失败:', error);
+                alert('网络错误，请稍后重试');
+            });
+        }
+
+        // 处理表单提交
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            // 确认修改
+            if (!confirm('确定要保存修改吗？')) {
+                return;
+            }
+
+            const student = {
+                id: document.getElementById('id').value.trim(),
+                name: document.getElementById('name').value.trim(),
+                gender: document.getElementById('gender').value,
+                classname: document.getElementById('classname').value.trim(),
+                birthDate: document.getElementById('birthDate').value,
+                contact: document.getElementById('contact').value.trim()
+            };
+
+            // 获取 token
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('/student/api/update', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? 'Bearer ' + token : ''
+                    },
+                    body: JSON.stringify(student)
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    alert('更新成功');
+                    window.location.href = '/student/list-page';
+                } else {
+                    alert('更新失败：' + (result.message || '未知错误'));
+                }
+            } catch (error) {
+                alert('网络错误，请稍后重试');
+            }
+        }
+
+        // 清空错误信息
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            document.querySelectorAll('.form-group input, .form-group select').forEach(el => el.classList.remove('error'));
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>

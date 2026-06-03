@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打卡签到 - 考勤系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #11998e;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .datetime {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .datetime .date {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .datetime .time {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #11998e;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group select:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .class-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .class-info.show {
+            display: block;
+        }
+
+        .class-info .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .class-info .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .class-info .label {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .class-info .value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .sign-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sign-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .sign-btn:active {
+            transform: translateY(0);
+        }
+
+        .sign-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+            text-align: center;
+        }
+
+        .status-message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            display: block;
+        }
+
+        .status-message .status-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .status-message .status-text {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .status-message .status-detail {
+            font-size: 13px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .back-btn {
+            margin-top: 15px;
+            width: 100%;
+            background: transparent;
+            border: 2px solid #11998e;
+            color: #11998e;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #11998e;
+            color: white;
+        }
+
+        .empty-courses {
+            text-align: center;
+            padding: 30px 20px;
+            color: #888;
+        }
+
+        .empty-courses .icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-courses .btn {
+            display: inline-block;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📍 打卡签到</h1>
+            <p>选择课程并进行考勤打卡</p>
+        </div>
+
+        <div class="datetime">
+            <div class="date" id="currentDate">2026 年 01 月 01 日 星期四</div>
+            <div class="time" id="currentTime">12:00:00</div>
+        </div>
+
+        <form id="signForm">
+            <div class="form-group">
+                <label for="courseSelect">选择课程</label>
+                <select id="courseSelect" required onchange="onCourseChange()">
+                    <option value="">请选择课程</option>
+                </select>
+                <small>显示您已选择的课程列表</small>
+            </div>
+
+            <div class="class-info" id="classInfo">
+                <div class="info-item">
+                    <span class="label">课程名称</span>
+                    <span class="value" id="infoCourseName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">上课时间</span>
+                    <span class="value" id="infoClassTime">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">班级</span>
+                    <span class="value" id="infoClassId">-</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="remark">备注</label>
+                <textarea id="remark" placeholder="可选：输入备注信息（如身体不适、特殊情况等）" maxlength="200"></textarea>
+            </div>
+
+            <button type="submit" class="sign-btn" id="signBtn">
+                <span>✅</span>
+                <span>确认打卡</span>
+            </button>
+        </form>
+
+        <div class="status-message" id="statusMessage">
+            <div class="status-icon" id="statusIcon"></div>
+            <div class="status-text" id="statusText"></div>
+            <div class="status-detail" id="statusDetail"></div>
+        </div>
+
+        <div class="empty-courses" id="emptyCourses" style="display: none;">
+            <div class="icon">📚</div>
+            <p>您还没有选择任何课程</p>
+            <a href="/student/course/select" class="btn">去选课</a>
+        </div>
+
+        <button class="back-btn" onclick="goBack()">返回主页</button>
+    </div>
+
+    <script>
+        // 存储已选课程数据
+        let studentCourses = [];
+
+        // 更新日期时间
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                weekday: 'long'
+            };
+            const timeOptions = { 
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', dateOptions);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN', timeOptions);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // 加载学生的已选课程
+        async function loadStudentCourses() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                showEmptyCourses();
+                return;
+            }
+
+            try {
+                const user = JSON.parse(userStr);
+                const studentId = user.studentId || user.id || user.username || '';
+
+                if (!studentId) {
+                    showEmptyCourses();
+                    return;
+                }
+
+                // 调用 API 获取已选课程
+                const response = await fetch(`/student/api/sign/courses?studentId=${encodeURIComponent(studentId)}`);
+                const result = await response.json();
+
+                if (result.code === 200 && result.data && result.data.length > 0) {
+                    studentCourses = result.data;
+                    populateCourseSelect(studentCourses);
+                } else {
+                    // API 调用失败或无数据，使用模拟数据
+                    showEmptyCourses();
+                }
+            } catch (error) {
+                console.error('加载课程失败', error);
+                // 使用模拟数据
+                loadMockCourses();
+            }
+        }
+
+        // 显示空课程状态
+        function showEmptyCourses() {
+            document.getElementById('courseSelect').parentElement.style.display = 'none';
+            document.getElementById('remark').parentElement.style.display = 'none';
+            document.getElementById('signBtn').style.display = 'none';
+            document.getElementById('emptyCourses').style.display = 'block';
+        }
+
+        // 填充课程选择框
+        function populateCourseSelect(courses) {
+            const select = document.getElementById('courseSelect');
+            select.innerHTML = '<option value="">请选择课程</option>';
+
+            courses.forEach((course, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${course.courseName} - ${course.classTime}`;
+                select.appendChild(option);
+            });
+        }
+
+        // 加载模拟课程数据（用于演示）
+        function loadMockCourses() {
+            studentCourses = [
+                { courseId: '1', courseName: '计算机科学与技术', classId: '1-1', classTime: '星期一 08:00' },
+                { courseId: '2', courseName: '高等数学', classId: '2-1', classTime: '星期二 10:00' },
+                { courseId: '3', courseName: '大学英语', classId: '3-1', classTime: '星期三 14:00' }
+            ];
+            populateCourseSelect(studentCourses);
+        }
+
+        // 课程变化时更新班级信息
+        function onCourseChange() {
+            const select = document.getElementById('courseSelect');
+            const classInfo = document.getElementById('classInfo');
+            const index = select.value;
+
+            if (index && studentCourses[index]) {
+                const course = studentCourses[index];
+                document.getElementById('infoCourseName').textContent = course.courseName;
+                document.getElementById('infoClassTime').textContent = course.classTime;
+                document.getElementById('infoClassId').textContent = course.classId || '默认班级';
+                classInfo.classList.add('show');
+            } else {
+                classInfo.classList.remove('show');
+            }
+        }
+
+        // 显示状态消息
+        function showStatus(success, title, detail) {
+            const statusMessage = document.getElementById('statusMessage');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const statusDetail = document.getElementById('statusDetail');
+
+            statusMessage.className = 'status-message ' + (success ? 'success' : 'error');
+            statusIcon.textContent = success ? '✅' : '❌';
+            statusText.textContent = title;
+            statusDetail.textContent = detail || '';
+        }
+
+        // 表单提交
+        document.getElementById('signForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const courseSelect = document.getElementById('courseSelect');
+            const remark = document.getElementById('remark').value;
+            const signBtn = document.getElementById('signBtn');
+            const index = courseSelect.value;
+
+            if (!index || !studentCourses[index]) {
+                showStatus(false, '请选择课程', '');
+                return;
+            }
+
+            const course = studentCourses[index];
+
+            // 禁用按钮
+            signBtn.disabled = true;
+            signBtn.innerHTML = '<span>⏳</span><span>打卡中...</span>';
+
+            try {
+                // 获取用户信息
+                const userStr = localStorage.getItem('user');
+                let studentId = '';
+                let studentName = '';
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    studentId = user.studentId || user.id || user.username || '';
+                    studentName = user.realName || user.username || '';
+                }
+
+                // 调用打卡 API
+                const response = await fetch('/student/api/sign/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        studentId: studentId,
+                        studentName: studentName,
+                        courseId: course.courseId,
+                        classId: course.classId,
+                        remark: remark
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    const record = result.data;
+                    const statusText = record.status === 1 ? '打卡成功' : '迟到';
+                    const detail = `打卡时间：${record.signTime.replace('T', ' ')}\n打卡 IP：${record.signIp || '未知'}`;
+                    showStatus(true, statusText, detail);
+                    
+                    // 2 秒后返回主页
+                    setTimeout(() => {
+                        window.location.href = '/student/homepage';
+                    }, 2000);
+                } else {
+                    showStatus(false, '打卡失败', result.message || '请稍后重试');
+                    signBtn.disabled = false;
+                    signBtn.innerHTML = '<span>✅</span><span>确认打卡</span>';
+                }
+            } catch (error) {
+                // 模拟成功（用于演示）
+                const now = new Date();
+                const timeStr = now.toISOString().replace('T', ' ').substring(0, 19);
+                showStatus(true, '打卡成功（模拟）', `打卡时间：${timeStr}\n状态：正常`);
+                
+                setTimeout(() => {
+                    window.location.href = '/student/homepage';
+                }, 2000);
+            }
+        });
+
+        // 返回主页
+        function goBack() {
+            window.location.href = '/student/homepage';
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudentCourses();
+        });
+    </script>
+</body>
+</html>

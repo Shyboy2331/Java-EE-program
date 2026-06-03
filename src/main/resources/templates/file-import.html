@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件导入</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        /* 导入类型选择 */
+        .import-type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .import-type-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .import-type-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .import-type-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .import-type-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .import-type-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 13px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .progress-container.show {
+            display: block;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back-records {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-back-records:hover {
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .result-box {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-title.success {
+            color: #28a745;
+        }
+
+        .result-title.error {
+            color: #dc3545;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .stat-card.success .stat-value {
+            color: #28a745;
+        }
+
+        .stat-card.fail .stat-value {
+            color: #dc3545;
+        }
+
+        .stat-card.total .stat-value {
+            color: #667eea;
+        }
+
+        .fail-report {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #c53030;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .template-info {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .template-info h3 {
+            color: #2e7d32;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .template-info ul {
+            margin-left: 20px;
+            color: #1b5e20;
+            font-size: 13px;
+        }
+
+        .template-info li {
+            margin-bottom: 5px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 文件导入</h1>
+        <p class="subtitle">支持 Excel 文件批量导入学生信息和打卡记录</p>
+
+        <!-- 导入类型选择 -->
+        <div class="import-type-selector">
+            <div class="import-type-btn active" data-type="student" onclick="selectImportType('student')">
+                <div class="import-type-icon">👨‍🎓</div>
+                <div class="import-type-label">学生数据导入</div>
+            </div>
+            <div class="import-type-btn" data-type="signRecord" onclick="selectImportType('signRecord')">
+                <div class="import-type-icon">📅</div>
+                <div class="import-type-label">打卡记录导入</div>
+            </div>
+        </div>
+
+        <!-- 模板说明 -->
+        <div class="template-info" id="templateInfo">
+            <h3>📋 学生数据导入说明</h3>
+            <ul>
+                <li><strong>必填字段：</strong>学号、姓名</li>
+                <li><strong>可选字段：</strong>班级、性别、出生日期、联系方式</li>
+                <li><strong>文件格式：</strong>.xls 或 .xlsx</li>
+                <li><strong>文件大小：</strong>不超过 10MB</li>
+                <li><strong>学号格式：</strong>6-20 位字母或数字</li>
+                <li><strong>日期格式：</strong>支持 yyyy-MM-dd、yyyy/MM/dd 等多种格式</li>
+            </ul>
+        </div>
+
+        <!-- 上传区域 -->
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">点击选择文件或拖拽文件到此处</div>
+            <div class="upload-hint">支持 .xls, .xlsx 格式，最大 10MB</div>
+            <input type="file" id="fileInput" accept=".xls,.xlsx">
+        </div>
+
+        <!-- 文件信息 -->
+        <div class="file-info" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-text" id="progressText"></div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <button class="btn" id="uploadBtn" disabled>开始导入</button>
+        <button class="btn btn-secondary" id="backBtn">返回主页</button>
+        <button class="btn btn-back-records" id="backToRecordsBtn" style="display: none;">↩️ 返回打卡记录</button>
+
+        <!-- 结果展示 -->
+        <div class="result-box" id="resultBox">
+            <div class="result-title" id="resultTitle"></div>
+            <div class="result-stats">
+                <div class="stat-card total">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">总记录数</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value" id="successCount">0</div>
+                    <div class="stat-label">成功导入</div>
+                </div>
+                <div class="stat-card fail">
+                    <div class="stat-value" id="failCount">0</div>
+                    <div class="stat-label">导入失败</div>
+                </div>
+            </div>
+            <div id="failReportContainer" style="display: none;">
+                <h4 style="margin-bottom: 10px; color: #c53030;">⚠️ 失败报告</h4>
+                <div class="fail-report" id="failReport"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const backBtn = document.getElementById('backBtn');
+        const backToRecordsBtn = document.getElementById('backToRecordsBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const resultBox = document.getElementById('resultBox');
+        const resultTitle = document.getElementById('resultTitle');
+        const totalCount = document.getElementById('totalCount');
+        const successCount = document.getElementById('successCount');
+        const failCount = document.getElementById('failCount');
+        const failReportContainer = document.getElementById('failReportContainer');
+        const failReport = document.getElementById('failReport');
+        const templateInfo = document.getElementById('templateInfo');
+
+        let selectedFile = null;
+        let currentImportType = 'student'; // 当前导入类型：student 或 signRecord
+
+        // 页面加载时检查 URL 参数
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            if (type === 'signRecord') {
+                selectImportType('signRecord');
+                backToRecordsBtn.style.display = 'block';
+                backBtn.style.display = 'none';
+            }
+        });
+
+        // 选择导入类型
+        function selectImportType(type) {
+            currentImportType = type;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.import-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.import-type-btn[data-type="${type}"]`).classList.add('active');
+            
+            // 更新模板说明
+            if (type === 'student') {
+                templateInfo.innerHTML = `
+                    <h3>📋 学生数据导入说明</h3>
+                    <ul>
+                        <li><strong>必填字段：</strong>学号、姓名</li>
+                        <li><strong>可选字段：</strong>班级、性别、出生日期、联系方式</li>
+                        <li><strong>文件格式：</strong>.xls 或 .xlsx</li>
+                        <li><strong>文件大小：</strong>不超过 10MB</li>
+                        <li><strong>学号格式：</strong>6-20 位字母或数字</li>
+                        <li><strong>日期格式：</strong>支持 yyyy-MM-dd、yyyy/MM/dd 等多种格式</li>
+                    </ul>
+                `;
+            } else {
+                templateInfo.innerHTML = `
+                    <h3>📋 打卡记录导入说明</h3>
+                    <ul>
+                        <li><strong>必填字段：</strong>学号、姓名、课程 ID、打卡时间、状态</li>
+                        <li><strong>可选字段：</strong>课程名称、班级 ID、上课时间、状态描述、IP 地址、备注</li>
+                        <li><strong>文件格式：</strong>.xls 或 .xlsx</li>
+                        <li><strong>文件大小：</strong>不超过 10MB</li>
+                        <li><strong>学号格式：</strong>6-20 位字母或数字</li>
+                        <li><strong>打卡时间：</strong>支持 yyyy-MM-dd HH:mm:ss、yyyy-MM-dd 等格式</li>
+                        <li><strong>状态：</strong>0-迟到 或 1-正常</li>
+                    </ul>
+                `;
+            }
+            
+            // 隐藏之前的结果
+            resultBox.classList.remove('show');
+            selectedFile = null;
+            fileInfo.classList.remove('show');
+            uploadBtn.disabled = true;
+        }
+
+        // 点击上传区域
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // 拖拽事件
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // 处理文件
+        function handleFile(file) {
+            if (!file) return;
+
+            // 验证文件类型
+            const validTypes = [
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/excel',
+                'application/x-msexcel'
+            ];
+            
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (extension !== 'xls' && extension !== 'xlsx') {
+                showAlert('请上传 Excel 文件（.xls 或 .xlsx）', 'error');
+                uploadArea.classList.add('shake');
+                setTimeout(() => uploadArea.classList.remove('shake'), 500);
+                return;
+            }
+
+            // 验证文件大小
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showAlert(`文件大小超过 10MB 限制（当前：${formatFileSize(file.size)}）`, 'error');
+                uploadArea.classList.add('shake');
+                setTimeout(() => uploadArea.classList.remove('shake'), 500);
+                return;
+            }
+
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = `文件大小：${formatFileSize(file.size)}`;
+            fileInfo.classList.add('show');
+            uploadBtn.disabled = false;
+            
+            // 隐藏之前的结果
+            resultBox.classList.remove('show');
+        }
+
+        // 上传按钮点击
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                showAlert('请先选择文件', 'warning');
+                return;
+            }
+
+            // 显示进度条
+            progressContainer.classList.add('show');
+            progressBar.style.width = '0%';
+            progressText.textContent = '正在验证文件...';
+            uploadBtn.disabled = true;
+
+            try {
+                // 先验证文件
+                const validateFormData = new FormData();
+                validateFormData.append('file', selectedFile);
+
+                const validateResponse = await fetch('/api/import/validate', {
+                    method: 'POST',
+                    body: validateFormData
+                });
+
+                const validateResult = await validateResponse.json();
+                
+                if (!validateResult.data.valid) {
+                    showAlert(validateResult.data.message || '文件验证失败', 'error');
+                    progressContainer.classList.remove('show');
+                    uploadBtn.disabled = false;
+                    return;
+                }
+
+                // 开始导入
+                progressText.textContent = '正在导入数据...';
+                progressBar.style.width = '50%';
+
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                // 根据导入类型选择 API 端点
+                const apiEndpoint = currentImportType === 'student' 
+                    ? '/api/import/students' 
+                    : '/api/import/sign-records';
+
+                const importResponse = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const importResult = await importResponse.json();
+                
+                progressBar.style.width = '100%';
+                progressText.textContent = '导入完成！';
+
+                // 显示结果
+                showResult(importResult);
+
+            } catch (error) {
+                console.error('导入失败:', error);
+                showAlert('导入失败：' + error.message, 'error');
+                progressContainer.classList.remove('show');
+                uploadBtn.disabled = false;
+            }
+        });
+
+        // 显示结果
+        function showResult(result) {
+            if (result.code === 200 && result.data) {
+                const data = result.data;
+                
+                totalCount.textContent = data.totalCount || 0;
+                successCount.textContent = data.successCount || 0;
+                failCount.textContent = data.failCount || 0;
+
+                if (data.success) {
+                    resultTitle.innerHTML = '✅ 导入成功';
+                    resultTitle.className = 'result-title success';
+                    failReportContainer.style.display = 'none';
+                    showAlert('所有数据导入成功！', 'success');
+                } else {
+                    resultTitle.innerHTML = '⚠️ 部分导入失败';
+                    resultTitle.className = 'result-title error';
+                    
+                    if (data.failRecords && data.failRecords.length > 0) {
+                        failReport.textContent = data.failReport || '无详细报告';
+                        failReportContainer.style.display = 'block';
+                    } else {
+                        failReportContainer.style.display = 'none';
+                    }
+                    
+                    showAlert(`成功导入 ${data.successCount} 条，失败 ${data.failCount} 条`, 'warning');
+                }
+
+                resultBox.classList.add('show');
+            } else {
+                showAlert(result.message || '导入失败', 'error');
+            }
+
+            uploadBtn.disabled = false;
+        }
+
+        // 返回按钮
+        backBtn.addEventListener('click', () => {
+            window.location.href = '/teacher/homepage';
+        });
+
+        // 返回打卡记录按钮
+        backToRecordsBtn.addEventListener('click', () => {
+            window.location.href = '/tch-sign-list';
+        });
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        // 显示提示消息
+        function showAlert(message, type) {
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            container = document.querySelector('.container');
+            const templateInfo = document.querySelector('.template-info');
+            container.insertBefore(alert, templateInfo.nextSibling);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

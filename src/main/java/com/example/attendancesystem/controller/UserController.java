@@ -1,6 +1,6 @@
 package com.example.attendancesystem.controller;
 
-import com.example.attendancesystem.servise.StudentServise;
+import com.example.attendancesystem.service.StudentService;
 import com.example.attendancesystem.data.Result;
 import com.example.attendancesystem.data.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,68 +13,40 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private StudentServise studentServise;
+    private StudentService studentService;
 
-    /**
-     * 新增用户
-     * POST /user/create
-     */
     @PostMapping("/create")
     public Result<String> create(@RequestBody User user) {
-        return Result.success(studentServise.createUser(user));
+        return Result.success(studentService.createUser(user));
     }
 
-    /**
-     * 根据ID查询用户
-     * GET /user/{id}
-     */
     @GetMapping("/{id}")
     public Result<User> getById(@PathVariable Long id) {
-        return Result.success(studentServise.getUserById(id));
+        return Result.success(studentService.getUserById(id));
     }
 
-    /**
-     * 根据用户名查询用户
-     * GET /user/username/{username}
-     */
     @GetMapping("/username/{username}")
     public Result<User> getByUsername(@PathVariable String username) {
-        return Result.success(studentServise.getUserByUsername(username));
+        return Result.success(studentService.getUserByUsername(username));
     }
 
-    /**
-     * 查询所有教师
-     * GET /user/teachers
-     */
     @GetMapping("/teachers")
     public Result<List<User>> getAllTeachers() {
-        return Result.success(studentServise.getAllTeachers());
+        return Result.success(studentService.getAllTeachers());
     }
 
-    /**
-     * 查询所有用户
-     * GET /user/list
-     */
     @GetMapping("/list")
     public Result<List<User>> getAllUsers() {
-        return Result.success(studentServise.getAllUsers());
+        return Result.success(studentService.getAllUsers());
     }
 
-    /**
-     * 更新用户
-     * PUT /user/update
-     */
     @PutMapping("/update")
     public Result<String> update(@RequestBody User user) {
-        return Result.success(studentServise.updateUser(user));
+        return Result.success(studentService.updateUser(user));
     }
 
-    /**
-     * 删除用户
-     * DELETE /user/{id}
-     */
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
-        return Result.success(studentServise.deleteUserById(id));
+        return Result.success(studentService.deleteUserById(id));
     }
 }

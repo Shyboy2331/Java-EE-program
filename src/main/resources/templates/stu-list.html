@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - 考勤系统'">学生列表 - 考勤系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: url('/templates/images/index-bg.jpg') no-repeat center center fixed;
+            background-color: #f5f7fa;
+            background-size: cover;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-menu a:hover,
+        .navbar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .user-info {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        /* 主体内容区 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-card h3 {
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .student-count {
+            font-size: 14px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .search-bar input,
+        .search-bar select {
+            padding: 10px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .search-bar input:focus,
+        .search-bar select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #da3232;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e1e1e1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 空数据提示 */
+        .empty-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-data .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        /* 操作按钮组 */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 8px 15px;
+            border: 1px solid #e1e1e1;
+            background: white;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination .active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination .disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <a href="/student/homepage" class="navbar-brand">📚 考勤系统</a>
+        <div class="navbar-menu">
+            <a href="/student/homepage">首页</a>
+            <a href="/student/list-page" class="active">学生列表</a>
+            <a href="/student/add">添加学生</a>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <span>管理员</span>
+        </div>
+    </nav>
+
+    <!-- 主体内容 -->
+    <div class="main-container">
+        <div class="content-card">
+            <h3>
+                📋 学生列表
+                <span class="student-count">共 <th:block th:text="${studentCount}">0</th:block> 名学生</span>
+            </h3>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <a href="/student/add" class="btn btn-primary">➕ 添加学生</a>
+                </div>
+            </div>
+
+            <!-- 搜索栏 -->
+            <form class="search-bar" method="get" action="/student/list-page">
+                <input type="text" name="name" placeholder="搜索姓名..." th:value="${paramName}" />
+                <input type="text" name="classname" placeholder="班级..." th:value="${paramClassname}" />
+                <select name="gender">
+                    <option value="">性别（全部）</option>
+                    <option value="男" th:selected="${paramGender == '男'}">男</option>
+                    <option value="女" th:selected="${paramGender == '女'}">女</option>
+                </select>
+                <button type="submit" class="btn btn-primary">🔍 搜索</button>
+                <a href="/student/list-page" class="btn btn-warning">🔄 重置</a>
+            </form>
+
+            <!-- 表格 -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>班级</th>
+                            <th>出生日期</th>
+                            <th>联系方式</th>
+                            <th style="width: 180px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 学生列表 -->
+                        <tr th:each="student : ${students}">
+                            <td th:text="${student.id != null ? student.id : '-'}">-</td>
+                            <td th:text="${student.name != null ? student.name : '-'}">-</td>
+                            <td>
+                                <span th:if="${student.gender != null}" th:text="${student.gender}">-</span>
+                                <span th:unless="${student.gender != null}" style="color: #999;">-</span>
+                            </td>
+                            <td th:text="${student.classname != null ? student.classname : '-'}">-</td>
+                            <td>
+                                <span th:if="${student.birthDate != null}" th:text="${student.birthDate}">-</span>
+                                <span th:unless="${student.birthDate != null}" style="color: #999;">-</span>
+                            </td>
+                            <td>
+                                <span th:if="${student.contact != null and student.contact != ''}" th:text="${student.contact}">-</span>
+                                <span th:unless="${student.contact != null and student.contact != ''}" style="color: #999;">-</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:href="@{/student/edit(id=${student.id})}" class="btn btn-sm btn-warning">编辑</a>
+                                    <a href="javascript:void(0)"
+                                       class="btn btn-sm btn-danger delete-btn"
+                                       th:data-student-id="${student.id}">删除</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- 空数据提示 -->
+                        <tr th:if="${#lists.isEmpty(students)}" style="background: #f8f9fa;">
+                            <td colspan="7" class="empty-data">
+                                <div class="icon">📭</div>
+                                <p>暂无学生数据</p>
+                                <a href="/student/add" class="btn btn-primary" style="margin-top: 15px;">➕ 添加第一名学生</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 空数据提示（JS 控制显示） -->
+            <div id="emptyData" class="empty-data" style="display: none;">
+                <div class="icon">📭</div>
+                <p>暂无学生数据</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时绑定所有删除按钮事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-student-id');
+                    if (studentId) {
+                        deleteStudent(studentId);
+                    }
+                });
+            });
+        });
+
+        // 删除学生
+        function deleteStudent(id) {
+            if (!confirm('确定要删除该学生吗？此操作不可恢复。')) {
+                return;
+            }
+
+            // 获取 token
+            const token = localStorage.getItem('token');
+
+            fetch('/student/api/' + encodeURIComponent(id), {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token ? 'Bearer ' + token : ''
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    alert('删除成功');
+                    window.location.reload();
+                } else {
+                    alert('删除失败：' + (result.message || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('删除失败:', error);
+                alert('网络错误，请稍后重试');
+            });
+        }
+    </script>
+</body>
+</html>

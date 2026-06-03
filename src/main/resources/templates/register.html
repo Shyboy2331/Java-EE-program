@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 考勤系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: url('/templates/images/register-bg.png') no-repeat center center fixed;
+            background-color: #764ba2;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 480px;
+            backdrop-filter: blur(10px);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .register-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 身份选择卡片 */
+        .role-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .role-card {
+            flex: 1;
+            padding: 18px 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .role-card:hover {
+            border-color: #764ba2;
+            background: #f5f0ff;
+        }
+
+        .role-card.active {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(118, 75, 162, 0.4);
+        }
+
+        .role-card .role-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .role-card .role-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .role-card .role-desc {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(118, 75, 162, 0.4);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
+        .extra-links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .extra-links a {
+            color: #764ba2;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .extra-links a:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 5px;
+            background: #e1e1e1;
+            transition: all 0.3s ease;
+        }
+
+        .strength-bar.weak {
+            background: #f44336;
+            width: 33%;
+        }
+
+        .strength-bar.medium {
+            background: #ff9800;
+            width: 66%;
+        }
+
+        .strength-bar.strong {
+            background: #4caf50;
+            width: 100%;
+        }
+
+        .role-input {
+            display: none;
+        }
+
+        .role-tip {
+            background: #f0f7ff;
+            border-left: 3px solid #667eea;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .role-tip strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>📝 用户注册</h1>
+            <p>创建新账号，开启考勤之旅</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <!-- 身份选择 -->
+        <div class="role-selector">
+            <div class="role-card active" data-role="STUDENT" onclick="selectRole('STUDENT')">
+                <div class="role-icon">👨‍🎓</div>
+                <div class="role-name">学生</div>
+                <div class="role-desc">学生考勤</div>
+            </div>
+            <div class="role-card" data-role="TEACHER" onclick="selectRole('TEACHER')">
+                <div class="role-icon">👨‍🏫</div>
+                <div class="role-name">教师</div>
+                <div class="role-desc">教学管理</div>
+            </div>
+        </div>
+
+        <input type="hidden" id="selectedRole" value="STUDENT" class="role-input">
+
+        <!-- 身份提示 -->
+        <div class="role-tip" id="roleTip">
+            <strong>👨‍🎓 学生注册：</strong>适用于学生用户，可进行日常考勤签到
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名（3-20 位）" required minlength="3" maxlength="20" />
+            </div>
+            <div class="form-group">
+                <label for="realName">真实姓名</label>
+                <input type="text" id="realName" name="realName" placeholder="请输入真实姓名" />
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码（6 位以上）" required minlength="6" />
+                <div class="password-strength">
+                    密码强度：
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="repassword">确认密码</label>
+                <input type="password" id="repassword" name="repassword" placeholder="请再次输入密码" required />
+            </div>
+            <button type="submit" class="register-btn">注 册</button>
+        </form>
+
+        <div class="extra-links">
+            <p>已有账号？<a href="/login">立即登录</a></p>
+        </div>
+    </div>
+
+    <script>
+        // 身份选择
+        function selectRole(role) {
+            document.getElementById('selectedRole').value = role;
+            
+            // 更新卡片样式
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.role === role) {
+                    card.classList.add('active');
+                }
+            });
+
+            // 更新提示文字
+            const roleTip = document.getElementById('roleTip');
+            if (role === 'STUDENT') {
+                roleTip.innerHTML = '<strong>👨‍🎓 学生注册：</strong>适用于学生用户，可进行日常考勤签到';
+            } else {
+                roleTip.innerHTML = '<strong>👨‍🏫 教师注册：</strong>适用于教师用户，可进行考勤管理、查看统计';
+            }
+        }
+
+        // 密码强度检测
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('strengthBar');
+
+            if (password.length === 0) {
+                strengthBar.className = 'strength-bar';
+            } else if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+                strengthBar.className = 'strength-bar weak';
+            } else if (password.length < 12) {
+                strengthBar.className = 'strength-bar medium';
+            } else {
+                strengthBar.className = 'strength-bar strong';
+            }
+        });
+
+        // 表单提交
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const repassword = document.getElementById('repassword').value;
+            const realName = document.getElementById('realName').value;
+            const role = document.getElementById('selectedRole').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // 验证密码是否一致
+            if (password !== repassword) {
+                errorMessage.textContent = '两次输入的密码不一致';
+                errorMessage.classList.add('show');
+                successMessage.classList.remove('show');
+                return;
+            }
+
+            try {
+                const response = await fetch('/user/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_name: username,
+                        pass_word: password,
+                        real_name: realName,
+                        role: role
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    successMessage.textContent = '注册成功！即将跳转到登录页面...';
+                    successMessage.classList.add('show');
+                    errorMessage.classList.remove('show');
+
+                    // 2 秒后跳转到登录页面
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = result.message || '注册失败，请稍后重试';
+                    errorMessage.classList.add('show');
+                    successMessage.classList.remove('show');
+                }
+            } catch (error) {
+                errorMessage.textContent = '网络错误，请稍后重试';
+                errorMessage.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
