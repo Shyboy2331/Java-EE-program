@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>请假申请 - 考勤系统</title>
+    <title>请假管理 - 考勤系统</title>
     <style>
         * {
             margin: 0;
@@ -15,18 +15,16 @@
             font-family: 'Microsoft YaHei', Arial, sans-serif;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
         .container {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 25px;
-            padding: 40px;
+            padding: 30px;
             width: 100%;
-            max-width: 550px;
+            max-width: 1200px;
+            margin: 0 auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         }
 
@@ -44,6 +42,50 @@
         .header p {
             color: #666;
             font-size: 14px;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: #ffe0e6;
+            color: #f5576c;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            max-width: 650px;
+            margin: 0 auto;
         }
 
         .form-group {
@@ -101,7 +143,6 @@
             gap: 15px;
         }
 
-        /* 家属知情选择 */
         .radio-group {
             display: flex;
             gap: 20px;
@@ -174,25 +215,6 @@
             display: block;
         }
 
-        .back-btn {
-            margin-top: 15px;
-            width: 100%;
-            background: transparent;
-            border: 2px solid #f5576c;
-            color: #f5576c;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: #f5576c;
-            color: white;
-        }
-
         .tips {
             background: #fff3e0;
             border-left: 3px solid #ff9800;
@@ -221,126 +243,547 @@
         .days-display.show {
             display: block;
         }
+
+        /* 请假记录表格 */
+        .record-section {
+            margin-top: 20px;
+        }
+
+        .record-section h2 {
+            color: #f5576c;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffe0e6;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .record-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .record-table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .record-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .record-table tr:hover {
+            background: #fafafa;
+        }
+
+        .record-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-approved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .cancel-no {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .cancel-yes {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .action-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-cancel:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-detail {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-detail:hover {
+            background: #e0e0e0;
+        }
+
+        .empty-tip {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .empty-tip i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* 详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #f5576c;
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #f5576c;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+        }
+
+        .detail-item label {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .detail-item span {
+            display: block;
+            color: #333;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid #f5576c;
+            color: #f5576c;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #f5576c;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📝 请假申请</h1>
-            <p>填写请假信息并提交申请</p>
+            <h1>📝 请假管理</h1>
+            <p>申请请假和查看请假记录</p>
         </div>
 
-        <div class="tips">
-            <strong>温馨提示：</strong> 请如实填写请假信息，提交后需等待老师审批。请假超过 3 天需要辅导员审批。
+        <!-- 标签页 -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('apply')">✏️ 申请请假</button>
+            <button class="tab-btn" onclick="switchTab('records')">📋 请假记录</button>
         </div>
 
-        <form id="leaveForm">
-            <div class="form-group">
-                <label for="leaveType">请假类型 <span class="required">*</span></label>
-                <select id="leaveType" required>
-                    <option value="">请选择请假类型</option>
-                    <option value="病假">病假</option>
-                    <option value="事假">事假</option>
-                    <option value="公假">公假</option>
-                    <option value="其他">其他</option>
-                </select>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="startDate">开始时间 <span class="required">*</span></label>
-                    <input type="datetime-local" id="startDate" required onchange="calculateDays()" />
+        <!-- 申请请假 -->
+        <div id="applyTab" class="tab-content active">
+            <div class="form-section">
+                <div class="tips">
+                    <strong>温馨提示：</strong> 请如实填写请假信息，提交后需等待老师审批。请假超过 3 天需要辅导员审批。
                 </div>
-                <div class="form-group">
-                    <label for="endDate">结束时间 <span class="required">*</span></label>
-                    <input type="datetime-local" id="endDate" required onchange="calculateDays()" />
+
+                <form id="leaveForm">
+                    <div class="form-group">
+                        <label for="leaveType">请假类型 <span class="required">*</span></label>
+                        <select id="leaveType" required>
+                            <option value="">请选择请假类型</option>
+                            <option value="病假">病假</option>
+                            <option value="事假">事假</option>
+                            <option value="公假">公假</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">开始时间 <span class="required">*</span></label>
+                            <input type="datetime-local" id="startDate" required onchange="calculateDays()" />
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">结束时间 <span class="required">*</span></label>
+                            <input type="datetime-local" id="endDate" required onchange="calculateDays()" />
+                        </div>
+                    </div>
+
+                    <div class="days-display" id="daysDisplay"></div>
+
+                    <div class="form-group">
+                        <label for="course">相关课程</label>
+                        <select id="course">
+                            <option value="">请选择课程（可选）</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reason">请假事由 <span class="required">*</span></label>
+                        <textarea id="reason" placeholder="请详细说明请假原因（如：生病需要去医院、家里有急事等）" required maxlength="500"></textarea>
+                        <small>最多 500 字</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>家属是否知情 <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="familyKnown" value="1" required />
+                                <span>是，已告知家属</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="familyKnown" value="0" required />
+                                <span>否，未告知家属</span>
+                            </label>
+                        </div>
+                        <small>请假需要告知家人，确保您的安全</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="familyContact">家属联系方式</label>
+                        <input type="tel" id="familyContact" placeholder="请输入家属手机号码" pattern="[1][3-9]\d{9}" />
+                        <small>格式：13812345678</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentContact">本人联系方式</label>
+                        <input type="tel" id="studentContact" placeholder="请输入本人手机号码" pattern="[1][3-9]\d{9}" />
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span>📤</span>
+                        <span>提交申请</span>
+                    </button>
+                </form>
+
+                <div class="status-message" id="statusMessage"></div>
+
+                <button class="back-btn" onclick="goBack()" style="width: 100%;">返回主页</button>
+            </div>
+        </div>
+
+        <!-- 请假记录 -->
+        <div id="recordsTab" class="tab-content">
+            <div class="record-section">
+                <h2>📋 我的请假记录</h2>
+                <div class="table-container">
+                    <table class="record-table" id="recordTable">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>请假类型</th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                                <th>天数</th>
+                                <th>审批状态</th>
+                                <th>销假状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordTableBody">
+                            <tr>
+                                <td colspan="8" class="empty-tip">
+                                    <i>📭</i>
+                                    暂无请假记录
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="days-display" id="daysDisplay"></div>
-
-            <div class="form-group">
-                <label for="course">相关课程</label>
-                <select id="course">
-                    <option value="">请选择课程（可选）</option>
-                    <option value="1">计算机科学与技术</option>
-                    <option value="2">高等数学</option>
-                    <option value="3">大学英语</option>
-                    <option value="4">数据结构</option>
-                    <option value="5">操作系统</option>
-                </select>
+    <!-- 详情弹窗 -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📄 请假详情</h3>
+                <button class="modal-close" onclick="closeDetailModal()">×</button>
             </div>
-
-            <div class="form-group">
-                <label for="reason">请假事由 <span class="required">*</span></label>
-                <textarea id="reason" placeholder="请详细说明请假原因（如：生病需要去医院、家里有急事等）" required maxlength="500"></textarea>
-                <small>最多 500 字</small>
-            </div>
-
-            <div class="form-group">
-                <label>家属是否知情 <span class="required">*</span></label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="familyKnown" value="1" required />
-                        <span>是，已告知家属</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="familyKnown" value="0" required />
-                        <span>否，未告知家属</span>
-                    </label>
-                </div>
-                <small>请假需要告知家人，确保您的安全</small>
-            </div>
-
-            <div class="form-group">
-                <label for="familyContact">家属联系方式</label>
-                <input type="tel" id="familyContact" placeholder="请输入家属手机号码" pattern="[1][3-9]\d{9}" />
-                <small>格式：13812345678</small>
-            </div>
-
-            <div class="form-group">
-                <label for="studentContact">本人联系方式</label>
-                <input type="tel" id="studentContact" placeholder="请输入本人手机号码" pattern="[1][3-9]\d{9}" />
-            </div>
-
-            <button type="submit" class="submit-btn">
-                <span>📤</span>
-                <span>提交申请</span>
-            </button>
-        </form>
-
-        <div class="status-message" id="statusMessage"></div>
-
-        <button class="back-btn" onclick="goBack()">返回主页</button>
+            <div id="detailContent"></div>
+        </div>
     </div>
 
     <script>
-        // 设置日期时间选择器的默认值
-        document.addEventListener('DOMContentLoaded', function() {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            
-            // 设置开始时间为当前时间
-            document.getElementById('startDate').value = now.toISOString().slice(0, 16);
-            
-            // 设置结束时间为 1 小时后
-            const endTime = new Date(now.getTime() + 60 * 60 * 1000);
-            document.getElementById('endDate').value = endTime.toISOString().slice(0, 16);
+        let currentUser = null;
 
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', function() {
             // 加载用户信息
             const userStr = localStorage.getItem('user');
             if (userStr) {
                 try {
-                    const user = JSON.parse(userStr);
+                    currentUser = JSON.parse(userStr);
                     // 预填充联系方式
-                    if (user.contact) {
-                        document.getElementById('studentContact').value = user.contact;
+                    if (currentUser.contact) {
+                        document.getElementById('studentContact').value = currentUser.contact;
                     }
+                    // 加载课程列表
+                    loadCourses();
+                    // 加载请假记录
+                    loadLeaveRecords();
                 } catch (e) {
                     console.error('解析用户信息失败', e);
                 }
             }
+
+            // 设置日期时间选择器的默认值
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('startDate').value = now.toISOString().slice(0, 16);
+            const endTime = new Date(now.getTime() + 60 * 60 * 1000);
+            document.getElementById('endDate').value = endTime.toISOString().slice(0, 16);
         });
+
+        // 切换标签页
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tab === 'apply') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('applyTab').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('recordsTab').classList.add('active');
+                loadLeaveRecords();
+            }
+        }
+
+        // 加载课程列表
+        async function loadCourses() {
+            try {
+                const response = await fetch('/student/api/courses');
+                if (response.ok) {
+                    const result = await response.json();
+                    const courseSelect = document.getElementById('course');
+                    if (result.code === 200 && result.data) {
+                        courseSelect.innerHTML = '<option value="">请选择课程（可选）</option>';
+                        result.data.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course.id;
+                            option.textContent = course.name;
+                            courseSelect.appendChild(option);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('加载课程失败', e);
+            }
+        }
+
+        // 加载请假记录
+        async function loadLeaveRecords() {
+            if (!currentUser) return;
+
+            const studentId = currentUser.studentId || currentUser.id || currentUser.username || '';
+            if (!studentId) {
+                document.getElementById('recordTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-tip">
+                            <i>⚠️</i>
+                            未找到学号信息
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/student/api/leave/list?studentId=${encodeURIComponent(studentId)}`);
+                const result = await response.json();
+
+                if (result.code === 200 && result.data && result.data.length > 0) {
+                    renderLeaveRecords(result.data);
+                } else {
+                    document.getElementById('recordTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-tip">
+                                <i>📭</i>
+                                暂无请假记录
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (e) {
+                console.error('加载请假记录失败', e);
+                // 模拟数据用于演示
+                renderLeaveRecords([]);
+            }
+        }
+
+        // 渲染请假记录
+        function renderLeaveRecords(records) {
+            const tbody = document.getElementById('recordTableBody');
+            tbody.innerHTML = '';
+
+            records.forEach((record, index) => {
+                const tr = document.createElement('tr');
+
+                const statusClass = getStatusClass(record.status);
+                const cancelClass = record.cancelStatus === 'YES' ? 'cancel-yes' : 'cancel-no';
+                const cancelText = record.cancelStatus === 'YES' ? '已销假' : '未销假';
+
+                let actionBtns = '';
+                if (record.status === 'APPROVED' && record.cancelStatus === 'NO') {
+                    actionBtns = `<button class="action-btn btn-cancel" onclick="cancelLeave(${record.id})">✅ 销假</button>`;
+                } else if (record.status === 'PENDING') {
+                    actionBtns = `<span style="color: #999; font-size: 12px;">审批中...</span>`;
+                } else if (record.status === 'REJECTED') {
+                    actionBtns = `<span style="color: #c62828; font-size: 12px;">已驳回</span>`;
+                } else {
+                    actionBtns = `<span style="color: #999; font-size: 12px;">已完成</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${record.leaveType || '-'}</td>
+                    <td>${formatDateTime(record.startTime)}</td>
+                    <td>${formatDateTime(record.endTime)}</td>
+                    <td>${record.days ? record.days.toFixed(1) : '-'}天</td>
+                    <td><span class="status-badge ${statusClass}">${getStatusText(record.status)}</span></td>
+                    <td><span class="status-badge ${cancelClass}">${cancelText}</span></td>
+                    <td>
+                        ${actionBtns}
+                        <button class="action-btn btn-detail" onclick="showDetail(${record.id})">详情</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            switch (status) {
+                case 'PENDING': return 'status-pending';
+                case 'APPROVED': return 'status-approved';
+                case 'REJECTED': return 'status-rejected';
+                default: return 'status-pending';
+            }
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            switch (status) {
+                case 'PENDING': return '审批中';
+                case 'APPROVED': return '通过';
+                case 'REJECTED': return '驳回';
+                default: return status;
+            }
+        }
+
+        // 格式化日期时间
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '-';
+            const date = new Date(dateTimeStr);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
 
         // 计算请假天数
         function calculateDays() {
@@ -359,16 +802,15 @@
                     return false;
                 }
 
-                // 计算天数差
                 const diffTime = Math.abs(end - start);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                
+
                 let text = `⏱️ 请假时长：${diffDays}天${hours > 0 ? hours + '小时' : ''}`;
                 if (diffDays >= 3) {
                     text += '（超过 3 天需要辅导员审批）';
                 }
-                
+
                 daysDisplay.textContent = text;
                 daysDisplay.style.color = '#f5576c';
                 daysDisplay.classList.add('show');
@@ -393,7 +835,6 @@
             const submitBtn = document.querySelector('.submit-btn');
             const statusMessage = document.getElementById('statusMessage');
 
-            // 验证日期
             const start = new Date(startDate.replace(' ', 'T'));
             const end = new Date(endDate.replace(' ', 'T'));
             if (end <= start) {
@@ -402,29 +843,19 @@
                 return;
             }
 
-            // 验证家属知情
             if (!familyKnown) {
                 statusMessage.textContent = '❌ 请选择家属是否知情';
                 statusMessage.className = 'status-message error';
                 return;
             }
 
-            // 禁用按钮
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span>⏳</span><span>提交中...</span>';
 
             try {
-                // 获取用户信息
-                const userStr = localStorage.getItem('user');
-                let studentId = '';
-                let studentName = '';
-                if (userStr) {
-                    const user = JSON.parse(userStr);
-                    studentId = user.studentId || user.id || user.username || '';
-                    studentName = user.realName || user.username || '';
-                }
+                const studentId = currentUser?.studentId || currentUser?.id || currentUser?.username || '';
+                const studentName = currentUser?.realName || currentUser?.username || '';
 
-                // 调用请假 API
                 const response = await fetch('/student/api/leave/apply', {
                     method: 'POST',
                     headers: {
@@ -450,11 +881,13 @@
                 if (result.code === 200) {
                     statusMessage.textContent = '✅ 申请提交成功！请等待老师审批';
                     statusMessage.className = 'status-message success';
-                    
-                    // 3 秒后返回主页
+
                     setTimeout(() => {
-                        window.location.href = '/student/homepage';
-                    }, 2000);
+                        switchTab('records');
+                        loadLeaveRecords();
+                        document.getElementById('leaveForm').reset();
+                        statusMessage.style.display = 'none';
+                    }, 1500);
                 } else {
                     statusMessage.textContent = '❌ ' + (result.message || '提交失败，请稍后重试');
                     statusMessage.className = 'status-message error';
@@ -462,20 +895,144 @@
                     submitBtn.innerHTML = '<span>📤</span><span>提交申请</span>';
                 }
             } catch (error) {
-                // 模拟成功（用于演示）
                 statusMessage.textContent = '✅ 申请提交成功！（模拟）请等待老师审批';
                 statusMessage.className = 'status-message success';
-                
+
                 setTimeout(() => {
-                    window.location.href = '/student/homepage';
-                }, 2000);
+                    switchTab('records');
+                    loadLeaveRecords();
+                }, 1500);
             }
         });
+
+        // 销假
+        async function cancelLeave(id) {
+            if (!confirm('确认要销假吗？')) return;
+
+            try {
+                const response = await fetch(`/student/api/leave/cancel/${id}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    alert('✅ 销假成功');
+                    loadLeaveRecords();
+                } else {
+                    alert('❌ ' + (result.message || '销假失败'));
+                }
+            } catch (error) {
+                alert('✅ 销假成功（模拟）');
+                loadLeaveRecords();
+            }
+        }
+
+        // 显示详情
+        async function showDetail(id) {
+            try {
+                const response = await fetch(`/student/api/leave/detail/${id}`);
+                const result = await response.json();
+
+                if (result.code === 200 && result.data) {
+                    const record = result.data;
+                    const content = document.getElementById('detailContent');
+                    content.innerHTML = `
+                        <div class="detail-item">
+                            <label>请假类型</label>
+                            <span>${record.leaveType || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>开始时间</label>
+                            <span>${formatDateTime(record.startTime)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>结束时间</label>
+                            <span>${formatDateTime(record.endTime)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>请假天数</label>
+                            <span>${record.days ? record.days.toFixed(1) : '-'}天</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>相关课程</label>
+                            <span>${record.courseName || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>请假事由</label>
+                            <span>${record.reason || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>家属是否知情</label>
+                            <span>${record.familyKnown === 1 ? '是，已告知家属' : '否，未告知家属'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>家属联系方式</label>
+                            <span>${record.familyContact || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>本人联系方式</label>
+                            <span>${record.studentContact || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>审批状态</label>
+                            <span><span class="status-badge ${getStatusClass(record.status)}">${getStatusText(record.status)}</span></span>
+                        </div>
+                        ${record.approvalComment ? `
+                        <div class="detail-item">
+                            <label>审批意见</label>
+                            <span>${record.approvalComment}</span>
+                        </div>
+                        ` : ''}
+                        ${record.approverName ? `
+                        <div class="detail-item">
+                            <label>审批人</label>
+                            <span>${record.approverName}</span>
+                        </div>
+                        ` : ''}
+                        ${record.approvalTime ? `
+                        <div class="detail-item">
+                            <label>审批时间</label>
+                            <span>${formatDateTime(record.approvalTime)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="detail-item">
+                            <label>销假状态</label>
+                            <span><span class="status-badge ${record.cancelStatus === 'YES' ? 'cancel-yes' : 'cancel-no'}">${record.cancelStatus === 'YES' ? '已销假' : '未销假'}</span></span>
+                        </div>
+                        ${record.cancelTime ? `
+                        <div class="detail-item">
+                            <label>销假时间</label>
+                            <span>${formatDateTime(record.cancelTime)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="detail-item">
+                            <label>申请时间</label>
+                            <span>${formatDateTime(record.createTime)}</span>
+                        </div>
+                    `;
+                    document.getElementById('detailModal').classList.add('show');
+                }
+            } catch (e) {
+                console.error('获取详情失败', e);
+            }
+        }
+
+        // 关闭详情弹窗
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
 
         // 返回主页
         function goBack() {
             window.location.href = '/student/homepage';
         }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDetailModal();
+            }
+        });
     </script>
 </body>
 </html>

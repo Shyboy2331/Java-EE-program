@@ -194,6 +194,17 @@ public class PageController {
     }
 
     /**
+     * 教师请假管理页面
+     * GET /teacher/leave-manage
+     */
+    @GetMapping("/teacher/leave-manage")
+    public ModelAndView teacherLeaveManagePage() {
+        ModelAndView mv = new ModelAndView("teacher-leave-manage");
+        mv.addObject("title", "请假管理");
+        return mv;
+    }
+
+    /**
      * 学生课程选择页面
      * GET /student/course/select
      */

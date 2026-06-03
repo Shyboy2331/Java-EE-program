@@ -49,7 +49,7 @@ public class SecurityConfig {
                 // 允许访问教师端页面
                 .requestMatchers("/teacher/homepage", "/teacher/course/create", "/tch-sign-list",
                     "/teacher/class-list", "/tch-homepage", "/stu-homepage",
-                    "/tch-course-create", "/stu-course-select", "/file-import").permitAll()
+                    "/tch-course-create", "/stu-course-select", "/file-import", "/teacher/leave-manage").permitAll()
                 // 其他所有请求需要认证
                 .anyRequest().authenticated()
             );
