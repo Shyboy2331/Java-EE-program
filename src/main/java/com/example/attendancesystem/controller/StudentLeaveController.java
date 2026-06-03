@@ -57,7 +57,7 @@ public class StudentLeaveController {
             }
 
             LeaveApplication saved = leaveApplicationService.applyLeave(application);
-            return Result.success(saved, "申请提交成功");
+            return Result.success(saved);
         } catch (Exception e) {
             return Result.error("提交失败：" + e.getMessage());
         }
@@ -92,7 +92,7 @@ public class StudentLeaveController {
                 return Result.error("只有已批准的请假申请才能销假");
             }
             LeaveApplication updated = leaveApplicationService.cancelLeave(id);
-            return Result.success(updated, "销假成功");
+            return Result.success(updated);
         } catch (Exception e) {
             return Result.error("销假失败：" + e.getMessage());
         }

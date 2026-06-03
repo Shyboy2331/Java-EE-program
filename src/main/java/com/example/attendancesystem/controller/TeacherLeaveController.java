@@ -105,7 +105,7 @@ public class TeacherLeaveController {
         try {
             String comment = body != null ? body.get("comment") : "";
             LeaveApplication application = leaveApplicationService.approve(id, approverId, approverName, comment);
-            return Result.success(application, "审批通过");
+            return Result.success(application);
         } catch (Exception e) {
             return Result.error("审批失败：" + e.getMessage());
         }
@@ -124,7 +124,7 @@ public class TeacherLeaveController {
         try {
             String comment = body != null ? body.get("comment") : "";
             LeaveApplication application = leaveApplicationService.reject(id, approverId, approverName, comment);
-            return Result.success(application, "已驳回");
+            return Result.success(application);
         } catch (Exception e) {
             return Result.error("操作失败：" + e.getMessage());
         }
