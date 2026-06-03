@@ -1,6 +1,8 @@
 package com.example.attendancesystem.controller;
 
 import com.example.attendancesystem.data.LeaveApplication;
+import com.example.attendancesystem.data.LeaveApplication.LeaveStatus;
+import com.example.attendancesystem.data.LeaveApplication.CancelStatus;
 import com.example.attendancesystem.data.Result;
 import com.example.attendancesystem.service.LeaveApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 package com.example.attendancesystem.controller;
 
 import com.example.attendancesystem.data.LeaveApplication;
+import com.example.attendancesystem.data.LeaveApplication.LeaveStatus;
 import com.example.attendancesystem.data.Result;
 import com.example.attendancesystem.service.LeaveApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class StudentLeaveController {
             if (application == null) {
                 return Result.error("请假记录不存在");
             }
-            if (application.getStatus() != LeaveApplication.LeaveStatus.APPROVED) {
+            if (application.getStatus() != LeaveStatus.APPROVED) {
                 return Result.error("只有已批准的请假申请才能销假");
             }
             LeaveApplication updated = leaveApplicationService.cancelLeave(id);
