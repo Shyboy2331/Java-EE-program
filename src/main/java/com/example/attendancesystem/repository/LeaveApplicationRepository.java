@@ -38,11 +38,6 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
     List<LeaveApplication> findByStudentIdAndStatusOrderByCreateTimeDesc(String studentId, LeaveStatus status);
 
     /**
-     * 查询所有待审批的请假申请
-     */
-    List<LeaveApplication> findByStatusOrderByCreateTimeDesc(LeaveStatus status);
-
-    /**
      * 查询需要销假的学生（已批准且未销假，且结束时间已过）
      */
     @Query("SELECT l FROM LeaveApplication l WHERE l.status = :status AND l.cancelStatus = :cancelStatus AND l.endTime < :now")
