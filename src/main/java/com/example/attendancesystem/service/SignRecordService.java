@@ -145,8 +145,8 @@ public class SignRecordService {
      * @param teacherName 教师姓名
      * @return 创建的课程
      */
-    public Course createCourse(String courseName, Integer classCount, String classTime, 
-                               String teacherId, String teacherName) {
+    public Course createCourse(String courseName, Integer classCount, String classTime,
+                               Long teacherId, String teacherName) {
         Course course = new Course();
         course.setCourseName(courseName);
         course.setClassCount(classCount);

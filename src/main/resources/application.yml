@@ -3,12 +3,12 @@ spring:
     name: demo
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=studentinfo;integratedSecurity=true;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true
+    url: jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=studentinfo;integratedSecurity=true;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:

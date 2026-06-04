@@ -51,12 +51,14 @@
             <artifactId>mssql-jdbc</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- SQL Server integrated authentication DLL -->
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc_auth</artifactId>
             <version>13.2.1.x64</version>
             <type>dll</type>
-            <scope>runtime</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/native/mssql-jdbc_auth-13.2.1.x64.dll</systemPath>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -78,6 +80,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <!-- CRaC support for Spring Boot 4.x -->
+        <dependency>
+            <groupId>org.crac</groupId>
+            <artifactId>crac</artifactId>
+            <version>1.5.0</version>
+        </dependency>
         <!-- Apache POI for Excel processing -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -93,7 +101,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jvmArguments>
-                        -Djava.library.path=.
+                        -Djava.library.path=${project.basedir}/native
                         -XX:+EnableDynamicAgentLoading
                     </jvmArguments>
                 </configuration>

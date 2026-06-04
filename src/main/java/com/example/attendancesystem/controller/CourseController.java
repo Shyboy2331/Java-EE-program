@@ -30,7 +30,7 @@ public class CourseController {
             String courseName = (String) request.get("courseName");
             Integer classCount = (Integer) request.get("classCount");
             String classTime = (String) request.get("classTime");
-            String teacherId = (String) request.get("teacherId");
+            Object teacherIdObj = request.get("teacherId");
             String teacherName = (String) request.get("teacherName");
 
             if (courseName == null || courseName.isEmpty()) {
@@ -43,6 +43,7 @@ public class CourseController {
                 return Result.error("上课时间不能为空");
             }
 
+            Long teacherId = (teacherIdObj instanceof Integer) ? ((Integer) teacherIdObj).longValue() : null;
             Course course = signRecordService.createCourse(courseName, classCount, classTime, teacherId, teacherName);
             return Result.success(course);
         } catch (Exception e) {

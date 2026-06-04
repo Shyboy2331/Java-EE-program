@@ -48,7 +48,7 @@ public class Course {
      */
     @Column(name = "teacher_id")
     @JsonProperty("teacher_id")
-    private String teacherId;
+    private Long teacherId;
     
     /**
      * 授课教师姓名
